@@ -19,9 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const maskImage = document.querySelector('.mask-img');
   const maskHeader = document.querySelector('.mask-container .header h1');
 
+  //Altura del contenedor en pixeles
   const spotlightContainerHeight = spotlightImages.offsetHeight;
+
+  //Tamaño de la ventana
   const viewportHeight = window.innerHeight;
+
+  //Offset inicial
   const initialOffset = spotlightContainerHeight * 0.05;
+
   const totalMovement =
     spotlightContainerHeight + initialOffset + viewportHeight;
 
@@ -36,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.set(headerSplit.words, { opacity: 0 });
   }
 
+  // gsap.set(maskImage, { transformOrigin: '50% 50%' });
+
   ScrollTrigger.create({
     trigger: '.spotlight',
     start: 'top top',
@@ -47,10 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const progress = self.progress;
 
       if (progress <= 0.5) {
+        //Mapea el progreso de 0 a 0.5 a un rango de 0 a 1
         const imagesMoveProgress = progress / 0.5;
 
+        //Rango de movimiento
         const startY = 5;
         const endY = -(totalMovement / spotlightContainerHeight) * 100;
+
+        //Valor intermedio entre dos puntos
+        //imagesMoveProgress -> actualuza el valor intermedio cda vez que se llama al update
         const currentY = startY + (endY - startY) * imagesMoveProgress;
 
         gsap.set(spotlightImages, {
@@ -58,10 +71,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      //? MASK ANIMATION
       if (maskContainer && maskImage) {
-        if (progress >= 0.25 && progress <= 0.75) {
+        if (progress < 0.25) {
+          maskContainer.style.setProperty('-webkit-mask-size', '0% 0%');
+          maskContainer.style.setProperty('mask-size', '0% 0%');
+
+          gsap.set(maskImage, {
+            scale: 1.5,
+          });
+        } else if (progress >= 0.25 && progress <= 0.75) {
           const maskProgress = (progress - 0.25) / 0.5;
-          const maskSize = `${maskProgress * 450}%`;
+
+          const maskSize = `${maskProgress * 2000}% ${maskProgress * 2000}%`;
           const imageScale = 1.5 - maskProgress * 0.5;
 
           maskContainer.style.setProperty('-webkit-mask-size', maskSize);
@@ -70,20 +92,36 @@ document.addEventListener('DOMContentLoaded', () => {
           gsap.set(maskImage, {
             scale: imageScale,
           });
-        } else if (progress < 0.25) {
-          maskContainer.style.setProperty('-webkit-mask-size', '0%');
-          maskContainer.style.setProperty('mask-size', '0%');
-
-          gsap.set(maskImage, {
-            scale: 1.5,
-          });
         } else if (progress > 0.75) {
-          maskContainer.style.setProperty('-webkit-mask-size', '450%');
-          maskContainer.style.setProperty('mask-size', '450%');
+          maskContainer.style.setProperty('-webkit-mask-size', '2000% 2000%');
+          maskContainer.style.setProperty('mask-size', '2000% 2000%');
 
           gsap.set(maskImage, {
             scale: 1,
           });
+        }
+      }
+
+      //? TEXT ANIMATION
+
+      if (headerSplit && headerSplit.words.length > 0) {
+        if (progress >= 0.75 && progress <= 0.95) {
+          const textProgress = (progress - 0.75) / 0.2;
+          const totalWords = headerSplit.words.length;
+
+          headerSplit.words.forEach((word, index) => {
+            const wordRevealProgress = index / totalWords;
+
+            if (textProgress >= wordRevealProgress) {
+              gsap.set(word, { opacity: 1 });
+            } else {
+              gsap.set(word, { opacity: 0 });
+            }
+          });
+        } else if (progress < 0.75) {
+          gsap.set(headerSplit.words, { opacity: 0 });
+        } else if (progress > 0.95) {
+          gsap.set(headerSplit.words, { opacity: 1 });
         }
       }
     },

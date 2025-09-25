@@ -116,10 +116,18 @@ section {
   left: 0;
   width: 100vw;
   height: 100svh;
-  -webkit-mask: url(/path_editor.svg) center/contain no-repeat;
+  /* -webkit-mask: url(/path_editor.svg) center/contain no-repeat;
   mask: url(/path_editor.svg) center/contain no-repeat;
   -webkit-mask-size: 0%;
-  mask-size: 0%;
+  mask-size: 0%; */
+  -webkit-mask-image: url(/path_editor.svg);
+  mask-image: url(/path_editor.svg);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 0% 0%;
+  mask-size: 0% 0%;
   overflow: hidden;
   z-index: 10;
 }
